@@ -126,7 +126,7 @@ describe("CSRF middleware", () => {
             .set("Cookie", cookies(res))
             .send({ _csrf: "42" })
             .expect(403)
-            .end((err, _res) => {
+            .end((err) => {
               if (err) return done(err);
               return done();
             });
@@ -148,7 +148,7 @@ describe("CSRF middleware", () => {
             .set("Cookie", cookies(res))
             .send({})
             .expect(403)
-            .end((err, _res) => {
+            .end((err) => {
               if (err) return done(err);
               return done();
             });

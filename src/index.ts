@@ -33,8 +33,8 @@ export function csurf(options: Options = {}) {
   const tokens = new Tokens();
 
   return async function csrf(event: CompatibilityEvent) {
-    var secret = getSecret(event);
-    var token: string | undefined = undefined;
+    let secret = getSecret(event);
+    let token: string | undefined = undefined;
 
     event.req.csrfToken = function csrfToken() {
       // Use cached token
