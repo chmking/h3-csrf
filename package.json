@@ -1,9 +1,13 @@
 {
   "name": "h3-csrf",
+  "description": "CSRF token middleware for H3",
   "version": "1.0.0",
+  "author": "Christopher King <chris@coyfox.net>",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
+    "LICENSE",
     "/dist"
   ],
   "scripts": {
@@ -12,7 +16,6 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
   },
-  "license": "MIT",
   "dependencies": {
     "csrf": "^3.1.0",
     "defu": "^6.0.0"
@@ -34,5 +37,10 @@
     "supertest": "^6.2.3",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.4"
-  }
+  },
+  "keywords": [
+    "csrf",
+    "middleware",
+    "h3"
+  ]
 }
