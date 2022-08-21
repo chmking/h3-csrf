@@ -1,5 +1,5 @@
 {
-  "name": "h3-csrf",
+  "name": "@chmking/h3-csrf",
   "description": "CSRF token middleware for H3",
   "version": "0.1.0",
   "author": "Christopher King <chris@coyfox.net>",
