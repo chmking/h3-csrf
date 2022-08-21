@@ -1,6 +1,6 @@
-name: Node.js CI
+name: Node.js Test & Build
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -8,7 +8,6 @@ jobs:
     strategy:
       matrix:
         node-version: [14.x, 16.x]
-
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
