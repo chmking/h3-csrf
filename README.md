@@ -35,13 +35,13 @@ handler(event: CompatibilityEvent) => {
 }
 ```
 
-### csurf([options])
+### csrf([options])
 
 Creates a middleware for token creation an validation. The middleare injects `event.req.csrfToken()` function to make a token which should be added to requests which mutate the state. This token it validated against the visitor's csrf cookie.
 
 ### Options
 
-The `csurf` function takes an optional `Options` object that may contain the following keys:
+The `csrf` function takes an optional `Options` object that may contain the following keys:
 
 #### verifiedMehtods?: Array\<HTTPMethod\>
 
@@ -50,6 +50,18 @@ A list of HTTP methods that will be verified by the CSRF middleware. Only the se
 Defaults:
 ```js
 ['PATCH', 'POST', 'PUT', 'DELETE']
+```
+
+#### cookies?: CookieOptions
+
+Cookie options define how the csrf cookie gets serialized. This extends `CookieSerializeOptions` from `cookie-es` to include `name` for cookie customization.
+
+Defaults:
+```js
+{
+    name: '_csrf',
+    path: '/'
+}
 ```
 
 ## License
