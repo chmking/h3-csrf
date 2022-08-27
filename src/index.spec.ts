@@ -158,7 +158,7 @@ describe('CSRF middleware', () => {
   })
 
   describe('when the cookie name is configured', () => {
-    const server = createTestServer({ cookies: { name: 'foo' } })
+    const server = createTestServer({ cookie: { name: 'foo' } })
 
     it('returns a cookie with the name', (done) => {
       request(server)

@@ -52,9 +52,9 @@ Defaults:
 ['PATCH', 'POST', 'PUT', 'DELETE']
 ```
 
-#### cookies?: CookieOptions
+#### cookie?: CookieOptions
 
-Cookie options define how the csrf cookie gets serialized. This extends `CookieSerializeOptions` from `cookie-es` to include `name` for cookie customization.
+Cookie options define how the CSRF cookie gets serialized. This extends `CookieSerializeOptions` from `cookie-es` to include `name` for cookie customization.
 
 Defaults:
 ```js

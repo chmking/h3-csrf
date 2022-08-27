@@ -26,12 +26,12 @@ export interface CookieOptions extends CookieSerializeOptions {
 
 export interface Options {
   verifiedMethods?: Array<HTTPMethod>
-  cookies?: CookieOptions
+  cookie?: CookieOptions
 }
 
 const defaultOptions: Options = {
   verifiedMethods: PayloadMethods,
-  cookies: {
+  cookie: {
     name: '_csrf',
     path: '/',
   },
@@ -43,7 +43,7 @@ export function csrf(options: Options = {}) {
   const tokens = new Tokens()
 
   return async function csrf(event: CompatibilityEvent) {
-    let secret = getSecret(event, opt.cookies)
+    let secret = getSecret(event, opt.cookie)
     let token: string | undefined = undefined
 
     event.req.csrfToken = function csrfToken() {
@@ -55,7 +55,7 @@ export function csrf(options: Options = {}) {
       // Generate a new secret
       if (!secret) {
         secret = tokens.secretSync()
-        setSecret(event, secret, opt.cookies)
+        setSecret(event, secret, opt.cookie)
       }
 
       // Create a new token
@@ -67,7 +67,7 @@ export function csrf(options: Options = {}) {
     // Generate a new secret
     if (!secret) {
       secret = tokens.secretSync()
-      setSecret(event, secret, opt.cookies)
+      setSecret(event, secret, opt.cookie)
     }
 
     if (isMethod(event, opt.verifiedMethods)) {
