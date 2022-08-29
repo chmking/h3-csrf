@@ -3,6 +3,13 @@
   "description": "CSRF token middleware for H3",
   "version": "0.2.0",
   "author": "Christopher King <chris@coyfox.net>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chmking/h3-csrf.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chmking/h3-csrf/issues"
+  },
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
