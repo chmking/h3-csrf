@@ -19,10 +19,10 @@ The CSRF protection middleware is added to H3 as a priority to inject `csrfToken
 ```js
 import { createServer } from 'http'
 import { createApp } from 'h3'
-import { csurf } from '@chmking/h3-csrf'
+import { csrf } from '@chmking/h3-csrf'
 
 const app = createApp()
-app.use(csurf())
+app.use(csrf({ cookie: { ... } }))
 
 const server = createServer(app)
 ```
