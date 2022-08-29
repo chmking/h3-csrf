@@ -10,6 +10,7 @@ import {
 } from 'h3'
 import { defu } from 'defu'
 import Tokens from 'csrf'
+import type { CookieSerializeOptions } from 'cookie-es'
 
 declare module 'h3' {
   interface IncomingMessage {
@@ -19,21 +20,30 @@ declare module 'h3' {
 
 const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
 
+export interface CookieOptions extends CookieSerializeOptions {
+  name?: string
+}
+
 export interface Options {
   verifiedMethods?: Array<HTTPMethod>
+  cookie?: CookieOptions
 }
 
 const defaultOptions: Options = {
   verifiedMethods: PayloadMethods,
+  cookie: {
+    name: '_csrf',
+    path: '/',
+  },
 }
 
-export function csurf(options: Options = {}) {
+export function csrf(options: Options = {}) {
   const opt = defu(options, defaultOptions)
 
   const tokens = new Tokens()
 
   return async function csrf(event: CompatibilityEvent) {
-    let secret = getSecret(event)
+    let secret = getSecret(event, opt.cookie)
     let token: string | undefined = undefined
 
     event.req.csrfToken = function csrfToken() {
@@ -45,7 +55,7 @@ export function csurf(options: Options = {}) {
       // Generate a new secret
       if (!secret) {
         secret = tokens.secretSync()
-        setSecret(event, secret)
+        setSecret(event, secret, opt.cookie)
       }
 
       // Create a new token
@@ -57,7 +67,7 @@ export function csurf(options: Options = {}) {
     // Generate a new secret
     if (!secret) {
       secret = tokens.secretSync()
-      setSecret(event, secret)
+      setSecret(event, secret, opt.cookie)
     }
 
     if (isMethod(event, opt.verifiedMethods)) {
@@ -77,13 +87,17 @@ export function csurf(options: Options = {}) {
   }
 }
 
-function getSecret(event: CompatibilityEvent) {
-  const cookie = useCookie(event, '_csrf')
+function getSecret(event: CompatibilityEvent, options: CookieOptions) {
+  const cookie = useCookie(event, options.name)
   return cookie
 }
 
-function setSecret(event: CompatibilityEvent, secret: string) {
-  setCookie(event, '_csrf', secret)
+function setSecret(
+  event: CompatibilityEvent,
+  secret: string,
+  options: CookieOptions
+) {
+  setCookie(event, options.name, secret, options)
 }
 
 async function useValue(

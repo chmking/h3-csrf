@@ -1,8 +1,9 @@
 import { createServer } from 'http'
 import { createApp, CompatibilityEvent } from 'h3'
-import { csurf } from './index'
+import { csrf, Options } from './index'
 import request, { Response } from 'supertest'
 import 'mocha'
+import { expect } from 'chai'
 
 describe('CSRF middleware', () => {
   describe('when a matching CSRF token is sent in the body', () => {
@@ -155,6 +156,61 @@ describe('CSRF middleware', () => {
         })
     })
   })
+
+  describe('when the cookie name is configured', () => {
+    const server = createTestServer({ cookie: { name: 'foo' } })
+
+    it('returns a cookie with the name', (done) => {
+      request(server)
+        .get('/')
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err)
+          const name = cookies(res).split('=')[0]
+          expect(name).to.equal('foo')
+          return done()
+        })
+    })
+
+    describe('when a matching CSRF token is sent in the body', () => {
+      it('returns success', (done) => {
+        request(server)
+          .get('/')
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err)
+            const token = res.text
+            request(server)
+              .post('/login')
+              .set('Cookie', cookies(res))
+              .send({ _csrf: token })
+              .expect(200, done)
+          })
+      })
+    })
+
+    describe('when an invalid CSRF token is sent', () => {
+      it('returns a 403', (done) => {
+        const server = createTestServer()
+        request(server)
+          .get('/')
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err)
+
+            request(server)
+              .post('/login')
+              .set('Cookie', cookies(res))
+              .send({ _csrf: '42' })
+              .expect(403)
+              .end((err) => {
+                if (err) return done(err)
+                return done()
+              })
+          })
+      })
+    })
+  })
 })
 
 function cookies(res: Response) {
@@ -165,9 +221,9 @@ function cookies(res: Response) {
     .join(';')
 }
 
-function createTestServer() {
+function createTestServer(options: Options = {}) {
   const app = createApp()
-  app.use(csurf())
+  app.use(csrf(options))
 
   // Return the CSRF Token for testing
   app.use('/', (event: CompatibilityEvent) => {
