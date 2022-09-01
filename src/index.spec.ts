@@ -1,5 +1,5 @@
 import { createServer } from 'http'
-import { createApp, CompatibilityEvent } from 'h3'
+import { createApp, CompatibilityEvent, readBody } from 'h3'
 import { csrf, Options } from './index'
 import request, { Response } from 'supertest'
 import 'mocha'
@@ -209,6 +209,37 @@ describe('CSRF middleware', () => {
               })
           })
       })
+    })
+  })
+
+  describe('when the body is read twice', () => {
+    it('does not block', (done) => {
+      const app = createApp()
+      app.use(csrf())
+      app.use('/login', async (event: CompatibilityEvent) => {
+        await readBody(event)
+      })
+      app.use('/', (event: CompatibilityEvent) => {
+        return event.req.csrfToken()
+      })
+      const server = createServer(app)
+
+      request(server)
+        .get('/')
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err)
+          const token = res.text
+          request(server)
+            .post('/login')
+            .set('Cookie', cookies(res))
+            .send({ _csrf: token })
+            .expect(200)
+            .end((err) => {
+              if (err) return done(err)
+              return done()
+            })
+        })
     })
   })
 })
