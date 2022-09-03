@@ -5,6 +5,7 @@
     "declaration": true,
     "esModuleInterop": true,
     "removeComments": true,
+    "skipLibCheck": true,
     "outDir": "./dist"
   },
   "ts-node": {
