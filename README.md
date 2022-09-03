@@ -12,6 +12,10 @@ This is a [Node.js](https://nodejs.org/en/) module available through the
 $ npm install @chmking/h3-csrf
 ```
 
+### Peer Dependency
+
+This package has a peer dependecy on H3 ~v0.7.21 which fixes an [issue](https://github.com/unjs/h3/issues/170) when an H3 event body is read twice.
+
 ## Usage
 
 The CSRF protection middleware is added to H3 as a priority to inject `csrfToken()` in the `event`:
