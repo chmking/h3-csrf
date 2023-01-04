@@ -12,30 +12,26 @@ This is a [Node.js](https://nodejs.org/en/) module available through the
 $ npm install @chmking/h3-csrf
 ```
 
-### Peer Dependency
-
-This package has a peer dependecy on H3 ~v0.7.21 which fixes an [issue](https://github.com/unjs/h3/issues/170) when an H3 event body is read twice.
-
 ## Usage
 
 The CSRF protection middleware is added to H3 as a priority to inject `csrfToken()` in the `event`:
 
 ```js
 import { createServer } from 'http'
-import { createApp } from 'h3'
+import { createApp, eventHandler, toNodeListener } from 'h3'
 import { csrf } from '@chmking/h3-csrf'
 
 const app = createApp()
-app.use(csrf({ cookie: { ... } }))
+app.use(eventHandler(csrf({ cookie: { ... } })))
 
-const server = createServer(app)
+const server = createServer(toNodeListener(app))
 ```
 
-Further down the layers, the token can be retrieved from the `event`:
+In following layers, the token can be retrieved from the `event`:
 
 ```js
-handler(event: CompatibilityEvent) => {
-    const token = event.req.csrfToken()
+handler(event: H3Event) => {
+    const token = event.node.req.csrfToken()
 }
 ```
 
@@ -52,8 +48,9 @@ The `csrf` function takes an optional `Options` object that may contain the foll
 A list of HTTP methods that will be verified by the CSRF middleware. Only the server endpoints corresponding to these methods will be verified.
 
 Defaults:
+
 ```js
-['PATCH', 'POST', 'PUT', 'DELETE']
+;['PATCH', 'POST', 'PUT', 'DELETE']
 ```
 
 #### cookie?: CookieOptions
@@ -61,6 +58,7 @@ Defaults:
 Cookie options define how the CSRF cookie gets serialized. This extends `CookieSerializeOptions` from `cookie-es` to include `name` for cookie customization.
 
 Defaults:
+
 ```js
 {
     name: '_csrf',
