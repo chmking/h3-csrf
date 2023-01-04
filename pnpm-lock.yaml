@@ -15,7 +15,7 @@ specifiers:
   eslint: ^8.15.0
   eslint-config-prettier: ^8.5.0
   eslint-plugin-prettier: ^4.0.0
-  h3: ^1.0.0
+  h3: ^1.0.2
   mocha: ^10.0.0
   prettier: 2.6.2
   radix3: ^1.0.0
