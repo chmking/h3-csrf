@@ -1,22 +1,32 @@
 import {
-  CompatibilityEvent,
+  H3Event,
   createError,
-  HTTPMethod,
   isMethod,
   setCookie,
-  useBody,
-  useCookie,
-  useQuery,
+  readBody,
+  getCookie,
+  getQuery,
 } from 'h3'
 import { defu } from 'defu'
 import Tokens from 'csrf'
 import type { CookieSerializeOptions } from 'cookie-es'
 
-declare module 'h3' {
+declare module 'http' {
   interface IncomingMessage {
     csrfToken: () => string
   }
 }
+
+type HTTPMethod =
+  | 'GET'
+  | 'HEAD'
+  | 'POST'
+  | 'PUT'
+  | 'DELETE'
+  | 'CONNECT'
+  | 'OPTIONS'
+  | 'TRACE'
+  | 'PATCH'
 
 const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
 
@@ -42,7 +52,7 @@ export function csrf(options: Options = {}) {
 
   const tokens = new Tokens()
 
-  return async function csrf(event: CompatibilityEvent) {
+  return async function csrf(event: H3Event) {
     let secret = getSecret(event, opt.cookie)
     let token: string | undefined = undefined
 
@@ -87,33 +97,27 @@ export function csrf(options: Options = {}) {
   }
 }
 
-function getSecret(event: CompatibilityEvent, options: CookieOptions) {
-  const cookie = useCookie(event, options.name)
+function getSecret(event: H3Event, options: CookieOptions) {
+  const cookie = getCookie(event, options.name)
   return cookie
 }
 
-function setSecret(
-  event: CompatibilityEvent,
-  secret: string,
-  options: CookieOptions
-) {
+function setSecret(event: H3Event, secret: string, options: CookieOptions) {
   setCookie(event, options.name, secret, options)
 }
 
-async function useValue(
-  event: CompatibilityEvent
-): Promise<string | undefined> {
+async function useValue(event: H3Event): Promise<string | undefined> {
   // Check in the request body
   if (isMethod(event, ['PATCH', 'POST', 'PUT', 'DELETE'])) {
-    const body = await useBody(event)
-    if (body._csrf) {
+    const body = await readBody(event)
+    if (body?._csrf) {
       return body._csrf
     }
   }
 
   // Check params and headers
   return (
-    (useQuery(event)._csrf as string) ||
+    (getQuery(event)._csrf as string) ||
     (event.req.headers['csrf-token'] as string) ||
     (event.req.headers['xsrf-token'] as string) ||
     (event.req.headers['x-csrf-token'] as string) ||

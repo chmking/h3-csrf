@@ -1,5 +1,5 @@
 import { createServer } from 'http'
-import { createApp, CompatibilityEvent, readBody } from 'h3'
+import { createApp, H3Event, readBody, toNodeListener, eventHandler } from 'h3'
 import { csrf, Options } from './index'
 import request, { Response } from 'supertest'
 import 'mocha'
@@ -215,14 +215,21 @@ describe('CSRF middleware', () => {
   describe('when the body is read twice', () => {
     it('does not block', (done) => {
       const app = createApp()
-      app.use(csrf())
-      app.use('/login', async (event: CompatibilityEvent) => {
-        await readBody(event)
-      })
-      app.use('/', (event: CompatibilityEvent) => {
-        return event.req.csrfToken()
-      })
-      const server = createServer(app)
+      app.use(eventHandler(csrf()))
+      app.use(
+        '/login',
+        eventHandler(async (event: H3Event) => {
+          await readBody(event)
+        })
+      )
+      app.use(
+        '/',
+        eventHandler((event: H3Event) => {
+          return event.node.req.csrfToken()
+        })
+      )
+
+      const server = createServer(toNodeListener(app))
 
       request(server)
         .get('/')
@@ -254,14 +261,20 @@ function cookies(res: Response) {
 
 function createTestServer(options: Options = {}) {
   const app = createApp()
-  app.use(csrf(options))
+  app.use(eventHandler(csrf(options)))
 
   // Return the CSRF Token for testing
-  app.use('/', (event: CompatibilityEvent) => {
-    return event.req.csrfToken()
-  })
+  app.use(
+    '/',
+    eventHandler((event: H3Event) => {
+      return event.node.req.csrfToken()
+    })
+  )
 
-  app.use('/login', () => 'Login')
+  app.use(
+    '/login',
+    eventHandler(() => 'Login')
+  )
 
-  return createServer(app)
+  return createServer(toNodeListener(app))
 }
