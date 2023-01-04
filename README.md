@@ -50,7 +50,7 @@ A list of HTTP methods that will be verified by the CSRF middleware. Only the se
 Defaults:
 
 ```js
-;['PATCH', 'POST', 'PUT', 'DELETE']
+['PATCH', 'POST', 'PUT', 'DELETE']
 ```
 
 #### cookie?: CookieOptions
