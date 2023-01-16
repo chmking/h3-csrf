@@ -1,7 +1,7 @@
 {
   "name": "@chmking/h3-csrf",
   "description": "CSRF token middleware for H3",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Christopher King <chris@coyfox.net>",
   "repository": {
     "type": "git",

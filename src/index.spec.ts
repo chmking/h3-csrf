@@ -1,4 +1,4 @@
-import { createServer } from 'http'
+import { createServer, Server } from 'http'
 import { createApp, H3Event, readBody, toNodeListener, eventHandler } from 'h3'
 import { csrf, Options } from './index'
 import request, { Response } from 'supertest'
@@ -158,7 +158,15 @@ describe('CSRF middleware', () => {
   })
 
   describe('when the cookie name is configured', () => {
-    const server = createTestServer({ cookie: { name: 'foo' } })
+    let server: Server | undefined = undefined
+
+    beforeEach(() => {
+      server = createTestServer({ cookie: { name: 'foo' } })
+    })
+
+    afterEach(() => {
+      server = undefined
+    })
 
     it('returns a cookie with the name', (done) => {
       request(server)
@@ -209,6 +217,38 @@ describe('CSRF middleware', () => {
               })
           })
       })
+    })
+  })
+
+  describe('when the verified methods are configured', () => {
+    let server: Server | undefined = undefined
+
+    beforeEach(() => {
+      server = createTestServer({ verifiedMethods: ['PUT'] })
+    })
+
+    afterEach(() => {
+      server = undefined
+    })
+
+    it('does not verify a POST request', (done) => {
+      request(server)
+        .post('/login')
+        .expect(200)
+        .end((err) => {
+          if (err) return done(err)
+          return done()
+        })
+    })
+
+    it('does verify a PUT request', (done) => {
+      request(server)
+        .put('/login')
+        .expect(403)
+        .end((err) => {
+          if (err) return done(err)
+          return done()
+        })
     })
   })
 

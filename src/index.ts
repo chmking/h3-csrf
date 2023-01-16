@@ -7,7 +7,7 @@ import {
   getCookie,
   getQuery,
 } from 'h3'
-import { defu } from 'defu'
+import { createDefu } from 'defu'
 import Tokens from 'csrf'
 import type { CookieSerializeOptions } from 'cookie-es'
 
@@ -48,6 +48,12 @@ const defaultOptions: Options = {
 }
 
 export function csrf(options: Options = {}) {
+  const defu = createDefu((obj, key, value) => {
+    if (key === 'verifiedMethods') {
+      obj[key] = Array.isArray(value) ? value : obj[key]
+      return true
+    }
+  })
   const opt = defu(options, defaultOptions)
 
   const tokens = new Tokens()
