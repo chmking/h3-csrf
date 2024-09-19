@@ -291,12 +291,13 @@ describe('CSRF middleware', () => {
   })
 })
 
-function cookies(res: Response) {
-  return res.headers['set-cookie']
-    .map(function (cookies: string) {
-      return cookies.split(';')[0]
-    })
-    .join(';')
+function cookies(res: Response): string {
+  const cookies = res.get('Set-Cookie')
+  if (cookies) {
+    return cookies.join(';')
+  }
+
+  return ''
 }
 
 function createTestServer(options: Options = {}) {
