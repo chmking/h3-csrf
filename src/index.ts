@@ -17,6 +17,12 @@ declare module 'http' {
   }
 }
 
+declare module 'cookie-es' {
+  interface CookieSerializeOptions {
+    name?: string
+  }
+}
+
 type HTTPMethod =
   | 'GET'
   | 'HEAD'
@@ -30,13 +36,9 @@ type HTTPMethod =
 
 const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
 
-export interface CookieOptions extends CookieSerializeOptions {
-  name?: string
-}
-
 export interface Options {
   verifiedMethods?: Array<HTTPMethod>
-  cookie?: CookieOptions
+  cookie?: CookieSerializeOptions
 }
 
 const defaultOptions: Options = {
@@ -103,12 +105,16 @@ export function csrf(options: Options = {}) {
   }
 }
 
-function getSecret(event: H3Event, options: CookieOptions) {
+function getSecret(event: H3Event, options: CookieSerializeOptions) {
   const cookie = getCookie(event, options.name)
   return cookie
 }
 
-function setSecret(event: H3Event, secret: string, options: CookieOptions) {
+function setSecret(
+  event: H3Event,
+  secret: string,
+  options: CookieSerializeOptions
+) {
   setCookie(event, options.name, secret, options)
 }
 
